@@ -1,0 +1,102 @@
+#include <bits/stdc++.h>
+#define ll long long
+#define maxn 305
+#define ii pair<ll,ll>
+#define F first
+#define S second
+#define sz(x) int(x.size())
+#define all(x) x.begin(),x.end()
+#define mem(x) memset(x,0,sizeof x)
+using namespace std;
+const ll oo = 1e18;
+const ll mod = 1e9 + 7;
+ll n, m;
+
+struct trie{
+	trie *child[30];
+	int cnt;
+	deque<int> num;
+	trie(){
+		for(int i = 0; i < 26; i ++)
+			child[i] = NULL;
+		cnt = 0;
+		num.clear();
+	}
+};
+
+trie *root = new trie();
+
+void add(string x, int k){
+	trie *par = root;
+	for(int i = 0; i < sz(x); i ++){
+		ll p = x[i] - 'a';
+		if(par -> child[p] == NULL) par -> child[p] = new trie();
+		par = par -> child[p];
+		par -> num.push_back(k);
+	}
+}
+
+ll find(string x){
+	//cout << x << '\n';
+	trie *par = root;
+	for(int i = 0; i < sz(x); i ++){
+		ll p = x[i] - 'a';
+		if(par -> child[p] == NULL) return -1;
+		par = par -> child[p];
+		//cout << x[i] << " " << par -> num. front() << '\n';
+	}
+	return par -> num.front();
+}
+
+void erase(string x){
+	trie *par = root;
+	//cout << x << '\n';
+	for(int i = 0; i < sz(x); i ++){
+		ll p = x[i] - 'a';
+		if(par -> child[p] -> num.size() == 1){
+			par -> child[p] = NULL;
+			return;
+		}
+		par = par -> child[p];
+		par -> num.pop_front();
+		if(par -> num.size() == 0) par = new trie();
+	}
+}
+
+vector< ii > a;
+vector<string> vec;
+
+int main()
+{
+    ios_base::sync_with_stdio(0);
+	cin.tie(0);
+	cout.tie(0);
+	cin >> n;
+	for(int i = 0; i < n * 2; i ++){
+		string s;
+		cin >> s;
+		vec.push_back(s);
+		a.emplace_back(- sz(s), i);
+	}
+	sort(all(a));
+	vector<ii> ans;
+
+	//for(auto x: a) cout << x.S << '\n';
+	
+	for(auto x: a){
+		int k = find(vec[x.S]);
+		//cout << x.S << " " << k << " " << vec[x.S] << '\n';
+		if(k == -1){
+			add(vec[x.S], x.S);
+			continue;
+		}
+		erase(vec[k]);
+		ans.emplace_back(k, x.S);
+	}
+	sort(all(ans));
+	for(ii x: ans){
+		cout << x.F + 1 << " " << x.S + 1 << '\n';
+	}
+	
+	
+}
